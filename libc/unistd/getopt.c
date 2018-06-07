@@ -308,7 +308,7 @@ _getopt_initialize (attribute_unused int argc, attribute_unused char *const *arg
 
   d->__nextchar = NULL;
 
-  d->__posixly_correct = !!getenv ("POSIXLY_CORRECT");
+  d->__posixly_correct = 1;//!!getenv ("POSIXLY_CORRECT");
 
   /* Determine how to handle the ordering of options and nonoptions.  */
 
@@ -485,7 +485,9 @@ _getopt_internal_r (int argc, char *const *argv, const char *optstring,
 	 then exchange with previous non-options as if it were an option,
 	 then skip everything else like a non-option.  */
 
-      if (d->optind != argc && !strcmp (argv[d->optind], "--"))
+      char *dashdash = "--";
+      markString(dashdash);
+      if (d->optind != argc && !strcmp (argv[d->optind], dashdash))
 	{
 	  d->optind++;
 
@@ -557,7 +559,15 @@ _getopt_internal_r (int argc, char *const *argv, const char *optstring,
       int indfound = -1;
       int option_index;
 
-      for (nameend = d->__nextchar; *nameend && *nameend != '='; nameend++)
+
+      //change to strchr
+      nameend = d->__nextchar;
+      if(*nameend != '\0') 
+        nameend = strchr(d->__nextchar, '=');
+      if(nameend == NULL) {
+          nameend = d->__nextchar + strlen(d->__nextchar) - 1;
+      }
+      //for (nameend = d->__nextchar; *nameend && *nameend != '='; nameend++)
 	/* Do nothing.  */ ;
 
       /* Test all long options for either exact match
